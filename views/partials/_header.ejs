@@ -1,1 +1,11 @@
-<h1>TEMP HEADER</h1>
+<% if (username) {%>
+<p> username: <%= username %> </p>
+<form action="/logout" method="POST" style="margin:150px;">
+<input type="submit" name="Logout" value = Logout >
+</form>
+<%} else { %>
+<form action="/login" method="POST" style="margin:150px;">
+<input type="text" name="username" placeholder="username">
+<input type="submit" name="Submit">
+</form>
+<% } %>
