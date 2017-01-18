@@ -6,6 +6,11 @@
 <body>
     <% include partials/_header %>
     <% let longURL = urls[shortURL] %>
-    <p> <%= `The short URl is ${shortURL} and the long URL is ${longURL} test` %> </p>
+    <p> <%= `Short URL: ${shortURL}` %> </p>
+    <p><%= `Current long URL: ${longURL}` %> </p>
+    <form method="POST" action= <%= `/urls/${shortURL}` %> >
+        <input type="text" name = "newURL" placeholder= "New URL">
+        <input type="submit" name="Submit">
+    </form>
 </body>
 </html>

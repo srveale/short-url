@@ -45,6 +45,12 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:id", (req, res) => {
+  console.log(req.body);
+  urlDatabase[req.params.id] = req.body.newURL;
+  res.redirect(`/urls/${req.params.id}`);
+});
+
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
