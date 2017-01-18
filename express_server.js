@@ -15,17 +15,23 @@ app.get("/", (req, res) => {
   res.end("Hello!");
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect(`/urls/`);
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase }
   res.render("urls_index", templateVars);
-});
-
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
 });
 
 app.post("/urls", (req, res) => {
@@ -54,6 +60,8 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+
+
 
 
 function generateRandomString() {
