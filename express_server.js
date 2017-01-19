@@ -15,6 +15,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const urlDatabase2 = {
+  {"general": {"b2xVn2": "http://www.lighthouselabs.ca",
+               "9sm5xK": "http://www.google.com"}}
+};
+
+
 const users = {};
 
 app.get("/", (req, res) => {
@@ -52,8 +58,10 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   if (req.cookies['user_id'] in users){
+
     urlDatabase[generateRandomString()] = req.body.longURL;
     res.redirect('/urls');
+
   } else {
     res.status(403);
     res.send('You need to be logged in to do that.');
@@ -73,10 +81,6 @@ app.post("/urls/:id", (req, res) => {
   console.log(req.body);
   urlDatabase[req.params.id] = req.body.newURL;
   res.redirect(`/urls/${req.params.id}`);
-});
-
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.get("/u/:shortURL", (req, res) => {
