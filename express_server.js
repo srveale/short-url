@@ -51,9 +51,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  urlDatabase[generateRandomString()] = req.body.longURL;
-  res.redirect('/urls')
+  if (req.cookies['user_id'] in users){
+    urlDatabase[generateRandomString()] = req.body.longURL;
+    res.redirect('/urls');
+  } else {
+    res.status(403);
+    res.send('You need to be logged in to do that.');
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
