@@ -3,11 +3,13 @@ const app = express();
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override')
 
 var PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride('_method'))
 
 app.use(cookieSession({
   name: 'session',
@@ -36,10 +38,10 @@ app.get("/", (req, res) => {
 
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   let user_id = req.session.user_id;
   if (req.params.id in urlDatabase[user_id]){
-    delete urlDatabase[req.params.id];
+    delete urlDatabase[user_id][req.params.id];
     res.redirect(`/urls/`);
   } else {
     res.status(403);
@@ -66,8 +68,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);
+app.put("/urls", (req, res) => {
   let user_id = req.session.user_id;
   if (user_id in users){
 
@@ -136,7 +137,6 @@ app.post("/login", (req, res) => {
     res.send("Incorrect Password");
   }
 
-  console.log
   req.session.user_id = user_id;
   res.redirect('/');
 });
@@ -148,8 +148,8 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+app.delete("/logout", (req, res) => {
+  req.session = null;
   res.redirect('/')
 });
 
@@ -160,11 +160,11 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 })
 
-app.post('/register', (req, res) => {
+app.put('/register', (req, res) => {
   let user_id = generateRandomString();
 
   for (user in users) {
-    if (req.body.email in user) {
+    if (req.body.email in users[user]) {
       res.status(400);
       res.send('User email already registered.');
     }

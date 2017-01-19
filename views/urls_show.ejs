@@ -5,10 +5,10 @@
 </head>
 <body>
     <% include partials/_header %>
-    <% let longURL = urls[shortURL] %>
+    <% let longURL = urls[user_id][shortURL] %>
     <p> <%= `Short URL: ${shortURL}` %> </p>
     <p><%= `Current long URL: ${longURL}` %> </p>
-    <form method="POST" action= <%= `/urls/${shortURL}` %> >
+    <form method="POST" action= <%= `/urls/${shortURL}?_method=PUT` %> >
         <input type="text" name = "newURL" placeholder= "New URL">
         <input type="submit" name="Submit">
     </form>
