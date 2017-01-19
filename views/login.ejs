@@ -4,10 +4,12 @@
   <title>TinyApp</title>
 </head>
 <body>
-<p> Enter your email and password </p>
-    <form action="/login" method="POST" >
+  <% include partials/_header %>
+  <p> Enter your email and password </p>
+  <form action="/login" method="POST" >
     <input type="email" name="email" placeholder="email">
     <input type="password" name="password" placeholder="password">
     <input type="submit" name="Submit">
+  </form>
 </body>
 </html>

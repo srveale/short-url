@@ -27,7 +27,12 @@ const urlDatabase = {
 const users = {};
 
 app.get("/", (req, res) => {
-
+  let user_id = req.session.user_id;
+  if (user_id in users) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 
 });
 
@@ -78,7 +83,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
                        urls: urlDatabase,
-                       user_id: req.cookies["user_id"],
+                       user_id: req.session.user_id,
                        users: users
                      };
   res.render("urls_show", templateVars);
