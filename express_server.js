@@ -67,6 +67,14 @@ app.get("/urls", (req, res) => {
                        user_id: req.session.user_id,
                        users: users
                      }
+
+  if (!req.session.user_id) {
+    res.render("urls_index");
+    res.status(401);
+    //res.send('You need to be logged in to visit URLs page');
+
+  }
+
   res.render("urls_index", templateVars);
 });
 

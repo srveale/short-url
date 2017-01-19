@@ -5,15 +5,20 @@
 </head>
 <body>
     <% include partials/_header %>
-    <ul>
-      <% for(var url in urls[user_id]) { %>
-        <li><%= url + ': ' + urls[user_id][url] %></li>
-        <form method="POST" action= <%= `/urls/${url}/delete?_method=DELETE` %> >
-          <a href= "<%= `/urls/${url}` %>" > Edit</a>
-          <input type="submit" value="Delete This URL">
-        </form>
-      <% } %>
-    </ul>
+    <% if (!user_id) { %>
+      <p> You need to be logged in to see the URLs </p>
+    <% } else { %>
+      <ul>
+        <% for(var url in urls[user_id]) { %>
+          <li><%= url + ': ' + urls[user_id][url] %></li>
+          <form method="POST" action= <%= `/urls/${url}/delete?_method=DELETE` %> >
+            <a href= "<%= `/urls/${url}` %>" > Edit</a>
+            <input type="submit" value="Delete This URL">
+          </form>
+        <% } %>
+      </ul>
+      <a href="/urls/new">Create new short link</a>
+    <% } %>
 
 </body>
 </html>
