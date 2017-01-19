@@ -28,7 +28,7 @@ const urlDatabase = {
 
 const users = {};
 const visitCounts = {};
-const uniqueCounts = {};
+const visits = {};
 
 app.get("/", (req, res) => {
   let user_id = req.session.user_id;
@@ -85,33 +85,60 @@ app.put("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  let uniqueVisits = Object.keys(visits).length;
+
   let templateVars = { shortURL: req.params.id,
                        urls: urlDatabase,
                        user_id: req.session.user_id,
                        users: users,
-                       visitCounts: visitCounts
+                       visitCounts: visitCounts,
+                       visits: visits,
+                       uniqueVisits: uniqueVisits
                      };
+
   res.render("urls_show", templateVars);
+
 });
 
 app.post("/urls/:id", (req, res) => {
   let user_id = req.session.user_id;
+
   if (req.params.id in urlDatabase[user_id]){
+
     urlDatabase[user_id][req.params.id] = req.body.newURL;
     res.redirect(`/urls/${req.params.id}`);
+
   } else {
+
     res.status(403);
     res.send("You don't have access to that code, or it doesn't exist")
+
   }
 });
 
 app.get("/u/:shortURL", (req, res) => {
   for (let user in urlDatabase) {
+
     let shortURL = req.params.shortURL
+    if (!(shortURL in visits)) {
+      visits[shortURL] = {};
+    }
+
     if (shortURL in urlDatabase[user]) {
+
+      let visitor_id = (req.session.user_id || generateRandomString())
+
+      if (!(visitor_id in visits[shortURL])) {
+        visits[shortURL][visitor_id] = [];
+      }
+
+      req.session.visitor_id = visitor_id;
+      visits[shortURL][visitor_id].push(new Date());
+
       visitCounts[shortURL] += 1;
       let longURL = urlDatabase[user][shortURL];
       res.redirect(longURL);
+
     }
 
   }

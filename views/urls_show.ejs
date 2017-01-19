@@ -13,5 +13,10 @@
         <input type="submit" name="Submit">
     </form>
     <p> <%= `Visits to this URL: ${visitCounts[shortURL]}` %> </p>
+    <p> <%= `Unique visitors to this URL: ${uniqueVisits}` %> </p>
+    <% for (visitor in visits[shortURL]) { %>
+    <p> <%= `Visitor: ${visitor}`  %> </p>
+    <p> <%= `Times: ${visits[shortURL][visitor]}` %> </p>
+    <% } %>
 </body>
 </html>
