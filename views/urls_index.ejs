@@ -6,8 +6,8 @@
 <body>
     <% include partials/_header %>
     <ul>
-      <% for(var url in urls) { %>
-        <li><%= url + ': ' + urls[url] %></li>
+      <% for(var url in urls[user_id]) { %>
+        <li><%= url + ': ' + urls[user_id][url] %></li>
         <form method="POST" action= <%= `/urls/${url}/delete` %> >
           <a href= "<%= `/urls/${url}` %>" > Edit</a>
           <input type="submit" value="Delete This URL">
