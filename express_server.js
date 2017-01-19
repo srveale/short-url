@@ -27,6 +27,8 @@ const urlDatabase = {
 };
 
 const users = {};
+const visitCounts = {};
+const uniqueCounts = {};
 
 app.get("/", (req, res) => {
   let user_id = req.session.user_id;
@@ -71,8 +73,9 @@ app.get("/urls", (req, res) => {
 app.put("/urls", (req, res) => {
   let user_id = req.session.user_id;
   if (user_id in users){
-
-    urlDatabase[user_id][generateRandomString()] =  req.body.longURL;
+    let url_id = generateRandomString()
+    urlDatabase[user_id][url_id] =  req.body.longURL;
+    visitCounts[url_id] = 0;
     res.redirect('/urls');
 
   } else {
@@ -85,7 +88,8 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
                        urls: urlDatabase,
                        user_id: req.session.user_id,
-                       users: users
+                       users: users,
+                       visitCounts: visitCounts
                      };
   res.render("urls_show", templateVars);
 });
@@ -103,9 +107,10 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   for (let user in urlDatabase) {
-
-    if (req.params.shortURL in urlDatabase[user]) {
-      let longURL = urlDatabase[user][req.params.shortURL];
+    let shortURL = req.params.shortURL
+    if (shortURL in urlDatabase[user]) {
+      visitCounts[shortURL] += 1;
+      let longURL = urlDatabase[user][shortURL];
       res.redirect(longURL);
     }
 
