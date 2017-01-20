@@ -1,5 +1,12 @@
 # short-url
 
+To Run:
+install packages
+
+nodemon -L express_server.js
+
+In browser go to:  localhost:3000/
+
 <ul>
 <li><p><code>GET /</code></p>
 
