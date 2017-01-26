@@ -1,48 +1,13 @@
-const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const cookieSession = require("cookie-session");
-const bcrypt = require("bcrypt");
-const methodOverride = require("method-override");
-const endpoints = require("./endpoints");
-
-var PORT = process.env.PORT || 3000;
-
-app.set("view engine", "ejs");
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(methodOverride('_method'));
-
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1', 'key2'],
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
-
-const urlDatabase = {
-  "general": {"b2xVn2": "http://www.lighthouselabs.ca",
-              "9sm5xK": "http://www.google.com"
-             },
-  "i5Nk4a":  {"b2xVn3": "http://www.lighthouselabs.ca",
-              "9sm5x9": "http://www.google.com"
-             }
-};
-
-const users = {};
-const visitCounts = {};
-const visits = {};
-const creationDates = {};
-
-//app.get("/", endpoints.getIndex);
-app.get("/", (req, res) => {
-  let user_id = req.session.user_id;
+module.exports.getIndex = function (res, req){
+ let user_id = req.session.user_id;
   if (user_id in users) {
     res.redirect('/urls');
   } else {
     res.redirect('/login');
   }
-});
+};
 
-app.delete("/urls/:id/delete", (req, res) => {
+module.exports.deleteURL = function (req, res) {
   let user_id = req.session.user_id;
   if (req.params.id in urlDatabase[user_id]){
     delete urlDatabase[user_id][req.params.id];
@@ -51,20 +16,21 @@ app.delete("/urls/:id/delete", (req, res) => {
     res.status(403);
     res.send("You don't have access to that code, or it doesn't exist");
   }
-});
+};
 
-app.get("/urls.json", (req, res) => {
+module.exports.getUrlsJson = function (req, res) {
   res.json(urlDatabase);
-});
+};
 
-app.get("/urls/new", (req, res) => {
+module.exports.getNew = function (req, res) {
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      };
-  res.render("urls_new", templateVars);
-});
 
-app.get("/urls", (req, res) => {
+  res.render("urls_new", templateVars);
+};
+
+module.exports.getURLS = function (req, res) {
   let user_id = req.session.user_id;
   let uniqueVisits = Object.keys(visits).length;
 
@@ -83,9 +49,9 @@ app.get("/urls", (req, res) => {
   }
 
   res.render("urls_index", templateVars);
-});
+};
 
-app.put("/urls", (req, res) => {
+module.putURLS = function (req, res) {
   let user_id = req.session.user_id;
 
   if (user_id in users){
@@ -104,9 +70,9 @@ app.put("/urls", (req, res) => {
     res.send('You need to be logged in to do that.');
 
   }
-});
+};
 
-app.get("/urls/:id", (req, res) => {
+module.exports.getEdit = function (req, res) {
   let uniqueVisits = Object.keys(visits).length;
   let shortURL = req.params.id;
   let user_id = req.session.user_id;
@@ -146,9 +112,9 @@ app.get("/urls/:id", (req, res) => {
                      };
 
   res.render("urls_show", templateVars);
-});
+};
 
-app.post("/urls/:id", (req, res) => {
+module.exports.postEdit = function (req, res) {
   let shortURL = req.params.id;
   let user_id = req.session.user_id;
   let shortURL_exists = false;
@@ -180,9 +146,9 @@ app.post("/urls/:id", (req, res) => {
     res.redirect(`/urls/${shortURL}`);
 
   }
-});
+};
 
-app.get("/u/:shortURL", (req, res) => {
+module.exports.getShortUrl = function (req, res) {
   let shortURL = req.params.shortURL;
   let shortURL_exists = false;
 
@@ -218,9 +184,9 @@ app.get("/u/:shortURL", (req, res) => {
 
     }
   }
-});
+};
 
-app.post("/login", (req, res) => {
+module.exports.postLogin = function (req, res) {
   let user_exists = false;
   let password_good = false;
   let user_id = '';
@@ -247,28 +213,29 @@ app.post("/login", (req, res) => {
 
   req.session.user_id = user_id;
   res.redirect('/');
-});
+};
 
-app.get("/login", (req, res) => {
+module.exports.getLogin = function  (req, res) {
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      };
   res.render("login", templateVars);
-});
+};
 
-app.delete("/logout", (req, res) => {
+module.exports.deleteLogout = function (req, res) {
   req.session = null;
   res.redirect('/');
-});
-app.get("/register", (req, res) => {
+};
+
+module.exports.getRegister = function (req, res) {
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      }
 
   res.render("register", templateVars);
-})
+};
 
-app.put('/register', (req, res) => {
+module.exports.putRegister = function (req, res) {
   let user_id = generateRandomString();
 
   for (user in users) {
@@ -293,18 +260,4 @@ app.put('/register', (req, res) => {
 
   req.session.user_id = user_id;
   res.redirect('/');
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
-function generateRandomString() {
-  //http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-  var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 6; i++ )
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
+};
