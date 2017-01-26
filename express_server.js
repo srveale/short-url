@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 const methodOverride = require("method-override");
-const endpoints = require("./endpoints");
 
 var PORT = process.env.PORT || 3000;
 
