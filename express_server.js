@@ -31,16 +31,6 @@ const visitCounts = {};
 const visits = {};
 const creationDates = {};
 
-//app.get("/", endpoints.getIndex);
-app.get("/", (req, res) => {
-  let user_id = req.session.user_id;
-  if (user_id in users) {
-    res.redirect('/urls');
-  } else {
-    res.redirect('/login');
-  }
-});
-
 app.delete("/urls/:id/delete", (req, res) => {
   let user_id = req.session.user_id;
   if (req.params.id in urlDatabase[user_id]){
@@ -57,52 +47,19 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  let user_id = req.session.user_id;
+  if (!user_id) {
+
+    res.status(401);
+    //res.send("You need to be logged in for that.");
+    res.redirect('/login');
+
+  }
+
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      };
   res.render("urls_new", templateVars);
-});
-
-app.get("/urls", (req, res) => {
-  let user_id = req.session.user_id;
-  let uniqueVisits = Object.keys(visits).length;
-
-  let templateVars = { urls: urlDatabase,
-                       user_id: user_id,
-                       users: users,
-                       creationDates: creationDates,
-                       visitCounts: visitCounts,
-                       uniqueVisits: uniqueVisits
-                     };
-
-  console.log(user_id);
-  if (!user_id) {
-    res.render("urls_index");
-    res.status(401);
-  }
-
-  res.render("urls_index", templateVars);
-});
-
-app.put("/urls", (req, res) => {
-  let user_id = req.session.user_id;
-
-  if (user_id in users){
-
-    let url_id = generateRandomString();
-    urlDatabase[user_id][url_id] =  req.body.longURL;
-
-    creationDates[url_id] = new Date();
-    visitCounts[url_id] = 0;
-
-    res.redirect('/urls');
-
-  } else {
-
-    res.status(403);
-    res.send('You need to be logged in to do that.');
-
-  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -120,31 +77,40 @@ app.get("/urls/:id", (req, res) => {
   if (!user_id) {
 
     res.status(401);
-    res.send("You need to be logged in for that.");
+    //res.send("You need to be logged in for that.");
+    res.redirect('/login');
 
-  } if (!(shortURL in urlDatabase[user_id])) {
+  }
 
-    res.status(403);
-    res.send("You do not have access to that URL.");
+  else if (urlDatabase[user_id]) {
 
-  } if (!shortURL_exists) {
+    if (!(shortURL in urlDatabase[user_id])) {
+      console.log('three prime')
+      res.status(403);
+      res.send("You do not have access to that URL.");
+
+    }
+  }
+
+  else if (!shortURL_exists) {
 
     res.status(404);
     res.send("Short URL with that id does not exist.");
 
   }
 
-  let templateVars = { shortURL: req.params.id,
-                       urls: urlDatabase,
-                       user_id: req.session.user_id,
-                       users: users,
-                       visitCounts: visitCounts,
-                       visits: visits,
-                       uniqueVisits: uniqueVisits,
-                       creationDates: creationDates
-                     };
+    let templateVars = { shortURL: req.params.id,
+                         urls: urlDatabase,
+                         user_id: req.session.user_id,
+                         users: users,
+                         visitCounts: visitCounts,
+                         visits: visits,
+                         uniqueVisits: uniqueVisits,
+                         creationDates: creationDates
+                       };
 
-  res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
+
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -181,8 +147,52 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
+app.get("/urls", (req, res) => {
+  let user_id = req.session.user_id;
+  let uniqueVisits = Object.keys(visits).length;
+
+  let templateVars = { urls: urlDatabase,
+                       user_id: user_id,
+                       users: users,
+                       creationDates: creationDates,
+                       visitCounts: visitCounts,
+                       uniqueVisits: uniqueVisits
+                     };
+
+  console.log(user_id);
+  if (!user_id) {
+    res.status(401);
+  }
+
+  res.render("urls_index", templateVars);
+});
+
+app.put("/urls", (req, res) => {
+  let user_id = req.session.user_id;
+
+  if (user_id in users){
+
+    let url_id = generateRandomString();
+    urlDatabase[user_id][url_id] =  req.body.longURL;
+
+    creationDates[url_id] = new Date();
+    visitCounts[url_id] = 0;
+
+    res.redirect('/urls');
+
+  } else {
+
+    res.status(403);
+    res.send('You need to be logged in to do that.');
+
+  }
+});
+
+
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
+  console.log('shortURL', shortURL);
+
   let shortURL_exists = false;
 
   for (user in urlDatabase) {
@@ -198,11 +208,14 @@ app.get("/u/:shortURL", (req, res) => {
   if (!(shortURL in visits)) {
     visits[shortURL] = {};
   }
-
+  console.log(visits);
   for (let user in urlDatabase) {
     if (shortURL in urlDatabase[user]) {
       shortURL_exists = true;
       let visitor_id = (req.session.user_id || generateRandomString());
+      console.log('visitor_id', visitor_id);
+      console.log('req.session.user_id', req.session.user_id);
+
 
       if (!(visitor_id in visits[shortURL])) {
         visits[shortURL][visitor_id] = [];
@@ -213,6 +226,7 @@ app.get("/u/:shortURL", (req, res) => {
 
       visitCounts[shortURL] += 1;
       let longURL = urlDatabase[user][shortURL];
+      console.log(visits);
       res.redirect(longURL);
 
     }
@@ -259,7 +273,17 @@ app.delete("/logout", (req, res) => {
   req.session = null;
   res.redirect('/');
 });
+
 app.get("/register", (req, res) => {
+  let user_id = req.session.user_id;
+
+  if (user_id) {
+
+    res.status(401);
+    res.redirect('/');
+
+  }
+
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      }
@@ -292,6 +316,15 @@ app.put('/register', (req, res) => {
 
   req.session.user_id = user_id;
   res.redirect('/');
+});
+
+app.get("/", (req, res) => {
+  let user_id = req.session.user_id;
+  if (user_id in users) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.listen(PORT, () => {

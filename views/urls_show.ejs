@@ -11,14 +11,13 @@
       <% let longURL = urls[user_id][shortURL] %>
       <p> <%= `Short URL: ${shortURL}` %> </p>
       <p> <%= `Visits to this URL: ${visitCounts[shortURL]}` %> </p>
-      <p> <%= `Unique visitors to this URL: ${uniqueVisits}` %> </p>
       <p> <%= `Date created: ${creationDates[shortURL]}` %> </p>
       <% for (visitor in visits[shortURL]) { %>
         <p> <%= `Visitor: ${visitor}`  %> </p>
         <p> <%= `Times: ${visits[shortURL][visitor]}` %> </p>
       <% } %>
       <p><%= `Current long URL: ${longURL}` %> </p>
-      <form method="POST" action= <%= `/urls/${shortURL}?_method=PUT` %> >
+      <form method="POST" action= <%= `/urls/${shortURL}` %> >
           <input type="text" name = "newURL" placeholder= "New URL">
           <input type="submit" name="Submit">
       </form>
