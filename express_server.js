@@ -276,6 +276,8 @@ app.delete("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
   let user_id = req.session.user_id;
+  console.log('user_id', user_id);
+
 
   if (user_id) {
 
