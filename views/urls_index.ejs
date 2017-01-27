@@ -25,9 +25,11 @@ form, table {
           </form>
           <p> <%= `Visits to this URL: ${visitCounts[shortURL]}` %> </p>
           <p> <%= `Date created: ${creationDates[shortURL]}` %> </p>
+          <a href="<%= `/u/${shortURL}` %>">Visit URL</a>
           </li>
         <% } %>
       </ul>
+      <p></p>
       <a href="/urls/new">Create new short link</a>
     <% } %>
 

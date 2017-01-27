@@ -85,7 +85,6 @@ app.get("/urls/:id", (req, res) => {
   else if (urlDatabase[user_id]) {
 
     if (!(shortURL in urlDatabase[user_id])) {
-      console.log('three prime')
       res.status(403);
       res.send("You do not have access to that URL.");
 
@@ -159,7 +158,6 @@ app.get("/urls", (req, res) => {
                        uniqueVisits: uniqueVisits
                      };
 
-  console.log(user_id);
   if (!user_id) {
     res.status(401);
   }
@@ -191,7 +189,6 @@ app.put("/urls", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  console.log('shortURL', shortURL);
 
   let shortURL_exists = false;
 
@@ -208,13 +205,10 @@ app.get("/u/:shortURL", (req, res) => {
   if (!(shortURL in visits)) {
     visits[shortURL] = {};
   }
-  console.log(visits);
   for (let user in urlDatabase) {
     if (shortURL in urlDatabase[user]) {
       shortURL_exists = true;
       let visitor_id = (req.session.user_id || generateRandomString());
-      console.log('visitor_id', visitor_id);
-      console.log('req.session.user_id', req.session.user_id);
 
 
       if (!(visitor_id in visits[shortURL])) {
@@ -226,7 +220,6 @@ app.get("/u/:shortURL", (req, res) => {
 
       visitCounts[shortURL] += 1;
       let longURL = urlDatabase[user][shortURL];
-      console.log(visits);
       res.redirect(longURL);
 
     }
@@ -275,17 +268,6 @@ app.delete("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let user_id = req.session.user_id;
-  console.log('user_id', user_id);
-
-
-  if (user_id) {
-
-    res.status(401);
-    res.redirect('/');
-
-  }
-
   let templateVars = { user_id: req.session.user_id,
                        users: users
                      }

@@ -7,6 +7,11 @@ nodemon -L express_server.js
 
 In browser go to:  localhost:3000/
 
+to view a short url:
+
+localhost:3000/u/:url_id
+
+
 <ul>
 <li><p><code>GET /</code></p>
 
